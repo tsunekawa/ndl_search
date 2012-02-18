@@ -1,6 +1,15 @@
 = ndl_search
 
-Description goes here.
+example:
+
+ require 'ndl_search'
+ 
+ ns = NDLSearch::NDLSearch.new
+ result = ns.search(:title=>"数学ガール")
+
+ result.items.map(&:title).each do |title|
+   puts title
+ end 
 
 == Contributing to ndl_search
  

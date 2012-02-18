@@ -17,11 +17,13 @@ Jeweler::Tasks.new do |gem|
   gem.name = "ndl_search"
   gem.homepage = "http://github.com/tsunekawa/ndl_search"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = "ndl_search.rb is a wrapper library for NDL Search OpenSearch API"
+  gem.description = "ndl_search.rb is a wrapper library for NDL Search OpenSearch API"
   gem.email = "tsunekaw@slis.tsukuba.ac.jp"
   gem.authors = ["Mao Tsunekawa"]
+
   # dependencies defined in Gemfile
+  gem.add_dependency "rest-client"
 end
 Jeweler::RubygemsDotOrgTasks.new
 
