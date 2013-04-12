@@ -1,3 +1,5 @@
+#-*- coding:utf-8 -*-
+
 require "rexml/document"
 require 'rest-client'
 require 'uri'
