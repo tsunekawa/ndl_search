@@ -37,6 +37,10 @@ module NDLSearch
       @resource = xml
     end
 
+    def item
+      items.first
+    end
+
     def items
       @items ||= @resource.get_elements('/rss/channel/item').map{|item| ::NDLSearch::Item.new(item) }
     end
@@ -58,7 +62,7 @@ module NDLSearch
     end
 
     def ndc
-      @ndc ||= @resource.get_text('dc:subject[@xsi:type="dcndl:NDC9"]')
+      @ndc ||= @resource.get_text('dc:subject[@xsi:type="dcndl:NDC9"]') or @resource.get_text('dc:subject[@xsi:type="dcndl:NDC"]')
     end
   end
 end
