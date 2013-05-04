@@ -66,7 +66,7 @@ module NDLSearch
       ndc = @resource.get_text('dc:subject[@xsi:type="dcndl:NDC"]') if ndc=="" or ndc.nil?
       if ndc=="" or ndc.nil? then
         item = @resource.get_text('//dcterms:subject/@rdf:resource').try(:find) {|e| e=~ /ndc9/ }
-        ndc  = item.nil? ? item.scan(/ndc9\/(.*)/).first.try(:first) : nil
+        ndc  = item.nil? ? nil: item.scan(/ndc9\/(.*)/).first.try(:first)
       end
 
       @ndc ||= ndc
