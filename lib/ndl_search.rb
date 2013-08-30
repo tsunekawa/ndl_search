@@ -3,6 +3,7 @@
 require "rexml/document"
 require 'rest-client'
 require 'uri'
+require 'nokogiri'
 
 module NDLSearch
   VERSION  = File.open(File.join(File.dirname(__FILE__), %w{ .. VERSION })).read
@@ -17,7 +18,7 @@ module NDLSearch
 
     def search(query)
       source = RestClient.get(construct_query(query))
-      ::NDLSearch::SearchResult.new(::REXML::Document.new(source))
+      ::NDLSearch::SearchResult.new(::Nokogiri::XML.parse(source))
     end
 
     def construct_query(query)
@@ -42,7 +43,7 @@ module NDLSearch
     end
 
     def items
-      @items ||= @resource.get_elements('/rss/channel/item').map{|item| ::NDLSearch::Item.new(item) }
+      @items ||= @resource.xpath('/rss/channel/item').map{|item| ::NDLSearch::Item.new(item) }
     end
   end
 
@@ -50,22 +51,23 @@ module NDLSearch
     attr_accessor :resource
 
     def initialize(xml)
+      xml = ::Nokogiri::XML.parse(xml) if xml.instance_of? String
       @resource = xml
     end
 
     def title
-      @title ||= @resource.get_text('title')
+      @title ||= @resource.at('title').text
     end
 
     def permalink
-      @guid ||=  @resource.get_text('guid')
+      @guid ||=  @resource.at('guid').text
     end
 
     def ndc
-      ndc = @resource.get_text('dc:subject[@xsi:type="dcndl:NDC9"]')
-      ndc = @resource.get_text('dc:subject[@xsi:type="dcndl:NDC"]') if ndc=="" or ndc.nil?
+      ndc = @resource.xpath('dc:subject[@xsi:type="dcndl:NDC9"]').text
+      ndc = @resource.xpath('dc:subject[@xsi:type="dcndl:NDC"]').text if ndc=="" or ndc.nil?
       if ndc=="" or ndc.nil? then
-        item = @resource.get_text('//dcterms:subject/@rdf:resource').try(:find) {|e| e=~ /ndc9/ }
+        item = @resource.xpath('//dcterms:subject/@rdf:resource').text.try(:find) {|e| e=~ /ndc9/ }
         ndc  = item.nil? ? nil: item.scan(/ndc9\/(.*)/).first.try(:first)
       end
 
