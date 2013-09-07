@@ -13,17 +13,28 @@ class NDLSearch::NDLSearch
   end
 
   def format_query(query)
-    URI.escape(query.to_s.gsub('　',' '))
+    case query
+    when String
+      query = {:any=>URI.escape(query.to_s.gsub('　',' '))}
+    when Hash
+      fq = Array.new
+      query.map do |field, value|
+        fq<<[field, URI.escape(value.to_s.gsub('　',' '))].join("=")
+      end
+      fq.join("&")
+    else
+      raise ArgumentError, "query should be String or Hash"
+    end
   end
 
   def search(query, options = {})
-    options = {:dpid => 'iss-ndl-opac', :item => 'any', :idx => 1, :per_page => 10, :sort=>'df'}.merge(options)
+    options = {:dpid => 'iss-ndl-opac', :idx => 1, :per_page => 10, :sort=>'df'}.merge(options)
     startrecord = options[:idx].to_i
     if startrecord == 0
       startrecord = 1
     end
 
-    url = "#{API_PATH}?dpid=#{options[:dpid]}&#{options[:item]}=#{format_query(query)}&cnt=#{options[:per_page]}&idx=#{startrecord}&sort=#{options[:sort]}"
+    url = "#{API_PATH}?dpid=#{options[:dpid]}&#{format_query(query)}&cnt=#{options[:per_page]}&idx=#{startrecord}&sort=#{options[:sort]}"
 
     feed = RSS::Parser.parse(url, false)
     ::NDLSearch::SearchResult.new(feed)
