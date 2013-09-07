@@ -1,9 +1,9 @@
 #-*- coding:utf-8 -*-
 
-require "rexml/document"
 require 'rest-client'
 require 'uri'
 require 'nokogiri'
+require 'facets/kernel'
 
 module NDLSearch
   VERSION  = File.open(File.join(File.dirname(__FILE__), %w{ .. VERSION })).read
@@ -61,6 +61,12 @@ module NDLSearch
 
     def permalink
       @guid ||=  @resource.at('guid').text
+    end
+
+    def language
+      @language  ||= @resource.at('//dcterms:language[@rdf:datatype="http://purl.org/dc/terms/ISO639-2"]')
+                              .try(:content)
+			      .try(:downcase)
     end
 
     def ndc
